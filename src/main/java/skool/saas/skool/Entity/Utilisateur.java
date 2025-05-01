@@ -1,8 +1,8 @@
 package skool.saas.skool.Entity;
 
-import com.eschoolback.eschool.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
+import skool.saas.skool.enums.Role;
 
 
 @Entity

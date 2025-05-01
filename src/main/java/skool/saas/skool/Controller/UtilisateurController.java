@@ -1,12 +1,11 @@
 package skool.saas.skool.Controller;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skool.saas.skool.Entity.Utilisateur;
+import skool.saas.skool.enums.Role;
 import skool.saas.skool.service.UtilisateurService;
 
 import java.util.Arrays;
@@ -22,17 +21,21 @@ public class UtilisateurController {
     @Autowired
     private UtilisateurService utilisateurService;
 
+
+    // Obtenir tous les rôles
     @GetMapping("/roles")
-    public List<com.eschoolback.eschool.enums.Role> getAllRoles() {
-        return Arrays.asList(com.eschoolback.eschool.enums.Role.values());
+    public ResponseEntity<Role[]> getAllRoles() {
+        return ResponseEntity.ok(Role.values());
     }
 
-//    @GetMapping("/utilisateur")
-//    public List<com.eschoolback.eschool.Entity.Utilisateur> getAllUtilisateur() {
-//        return utilisateurService.getAll();
-//    }
+    // Obtenir tous les utilisateurs
+    @GetMapping("/utilisateur")
+    public ResponseEntity<List<Utilisateur>> getAllUtilisateur() {
+        List<Utilisateur> utilisateurs = utilisateurService.getAll();
+        return ResponseEntity.ok(utilisateurs);
+    }
 
-
+    // Authentification utilisateur
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Utilisateur utilisateur) {
         System.out.println("Email: " + utilisateur.getEmail() + ", Password: " + utilisateur.getPassword() + ", Role: " + utilisateur.getRole());
@@ -47,15 +50,19 @@ public class UtilisateurController {
         } else {
             response.put("success", false);
             response.put("message", "Identifiants ou rôle incorrects");
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 
+
+    // Enregistrement d'un utilisateur
     @PostMapping("/save")
-    public Utilisateur saveUtilisateur(@RequestBody Utilisateur utilisateur) {
-        return utilisateurService.saveUtilisateur(utilisateur);
+    public ResponseEntity<Utilisateur> saveUtilisateur(@RequestBody Utilisateur utilisateur) {
+        Utilisateur savedUser = utilisateurService.saveUtilisateur(utilisateur);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
+    // Obtenir le rôle d'un utilisateur par son email
     @GetMapping("/role/{email}")
     public ResponseEntity<String> getRoleByEmail(@PathVariable String email) {
         String role = utilisateurService.getRoleByEmail(email);
